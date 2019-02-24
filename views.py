@@ -1,22 +1,26 @@
 import os
 import sqlite3
+import requests
 
 from flask import Flask, session, flash, request, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 
+from credentials import API_KEY, API_SECRET
+
+from forms import LoginForm
+from models import User, db
 
 app = Flask(__name__)
 app.config.from_object('_config')
-db = SQLAlchemy(app)
-
-from forms import LoginForm
-from models import User
+db.init_app(app)
+db.create_all(app=app)
 
 def connect_db():
 	return sqlite3.connect(app.config['DATABASE_PATH'])
 
 @app.route('/index/')
 def index():
+	res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":API_KEY, "isbns": "9781632168146"})
 	return render_template('index.html')
 
 @app.route("/", methods=['GET', 'POST'])
