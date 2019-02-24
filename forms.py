@@ -3,7 +3,7 @@ from wtforms import TextField, PasswordField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 class LoginForm(Form):
-	name = TextField('Username', validators=[DataRequired()])
+	username = TextField('Username', validators=[DataRequired()])
 	password = PasswordField('Password', validators=[DataRequired()])
 
 class SignUpForm(Form):
