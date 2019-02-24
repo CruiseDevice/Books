@@ -20,4 +20,18 @@ class User(db.Model):
 	def __repr__(self):
 		return '<User: {0}>'.format(self.username)
 
-		
+class Books(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	isbn = db.Column(db.Integer, unique=True, nullable=False)
+	title = db.Column(db.String, nullable=False)
+	author = db.Column(db.String, nullable=False)
+	year = db.Column(db.Integer, nullable=False)
+
+	def __init__(self, isbn=None, title=None, author=None, year=None):
+		self.isbn = isbn
+		self.title = title
+		self.author = author
+		self.year = year
+
+	def __repr__(self):
+		return '<Book: {0}>'.format(self.title)
