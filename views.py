@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.exc import IntegrityError
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from credentials import API_KEY, API_SECRET
 
@@ -36,14 +36,19 @@ def login():
 	error = None
 	form = LoginForm(request.form)
 	if form.validate_on_submit():
-		user = User.query.filter_by(name=request.form['name']).first()
-		if user is not None and user.password == request.form['password']:
-			session['logged_in'] = True
-			session['user_id'] = user.id
-			session['role'] = user.role
-			session['name'] = user.name
-			flash('Welcome!')
-			return redirect(url_for('index'))
+		username = form.username.data
+		password = form.password.data
+
+		user = User.query.filter_by(username=username).first()
+		if user:
+			pasword_hash = user.password
+			if check_password_hash(pasword_hash, password):
+				session['logged_in'] = True
+				session['user_id'] = user.id
+				session['role'] = user.role
+				session['name'] = user.username
+				flash('Welcome!')
+				return redirect(url_for('index'))
 		else:
 			error = 'Invalid username or password.'
 	return render_template('login.html',form=form, error=error)
@@ -58,7 +63,7 @@ def signup():
 			email = form.email.data
 			password = form.password.data
 			password = generate_password_hash(password)
-			new_user = User(name=username, email=email, password=password)
+			new_user = User(username=username, email=email, password=password)
 			try:
 				db.session.add(new_user)
 				db.session.commit()

@@ -8,10 +8,10 @@
   <form class="form-signin" role="form" method="post" action="/">
     {{ form.csrf_token }}
     <div class="input-group form-group">
-      {{ form.name(placeholder="user name") }}
-      {% if form.name.errors %}
+      {{ form.username(placeholder="username") }}
+      {% if form.username.errors %}
         <span class="error">
-          {% for error in form.name.errors %}
+          {% for error in form.username.errors %}
             {{ error }}
           {% endfor %}
         </span>
