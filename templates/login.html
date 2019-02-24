@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class = "container">
-  <h1>Welcome to Books.</h1>
+  <h1>Welcome to Books site.</h1>
   <h3>Please sign in to access your task list.</h3>
 
   <form class="form-signin" role="form" method="post" action="/">
@@ -30,7 +30,7 @@
     <button class="btn btn-sm btn-success" type="submit">Sign in</button>
     <br>
     <br>
-    <p><em>Need an account?</em><a href="/register">Signup!!</a></p>
+    <p><em>Need an account?</em><a href="{{url_for('signup')}}">Signup!!</a></p>
   </form>
 </div>
 
