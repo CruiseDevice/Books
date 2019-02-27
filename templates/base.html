@@ -8,6 +8,8 @@
 <script type="text/javascript" src = "{{url_for('static',filename='js/bootstrap.js')}}"></script>
 <script type="text/javascript" src = "{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
 <body>
+	{% block nav %}
+	{% endblock %}
 	<div class = "container">
 		{% for message in get_flashed_messages() %}
 			<div class = "flash">

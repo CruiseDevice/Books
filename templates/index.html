@@ -1,8 +1,34 @@
 {% extends "base.html" %}
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="#">Books</a>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+	    <ul class="navbar-nav">
+	      <li class="nav-item active">
+	        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+	      </li>
+	      <li class = "nav-item">
+			<a class = "nav-link" href="{{url_for('logout')}}">Logout</a>
+	      </li>
+	    </ul>
+	  </div>
+	</nav>
+{% endblock %}
 {% block content %}
 	<div class = "container">
 		<h1>Welcome.</h1>
 		<br>
-		<a href="{{url_for('logout')}}">Logout</a>
+		<form class = "search_form" role="form" method="POST" action="">
+			{{form.csrf_token}}
+			{{form.query(placeholder="Enter your Query")}}
+			{% if form.query.errors %}
+		        <span class="error">
+		          {% for error in form.query.errors %}
+		            {{ error }}
+		          {% endfor %}
+		        </span>
+		      {% endif %}
+        <button class="btn btn-sm btn-success" type="submit">Search</button>
+		</form>
 	</div>
 {% endblock %}
