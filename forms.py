@@ -36,3 +36,6 @@ class SignUpForm(Form):
 												EqualTo('password')
 												]
 									)
+
+class SearchForm(Form):
+	query = TextField('Query', validators=[DataRequired()])
