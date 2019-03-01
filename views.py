@@ -1,4 +1,5 @@
 import os
+import json
 import sqlite3
 import requests
 
@@ -23,21 +24,21 @@ app.config.from_object('_config')
 db.init_app(app)
 db.create_all(app=app)
 
+
 def connect_db():
 	return sqlite3.connect(app.config['DATABASE_PATH'])
+
 
 @app.route('/index/', methods=['GET', 'POST'])
 def index(results=None):
 	query = SearchForm(request.form)
 	if request.method == 'POST':
 		results = search_results(query)
-	res = requests.get("https://www.goodreads.com/book/review_counts.json",
-			params={"key":API_KEY, "isbns": "9781632168146"})
 	return render_template('index.html', form=query, results=results)
+
 
 @app.route('/results')
 def search_results(query):
-	results = []
 	if query:
 		search_query = query.data['query']
 		if search_query:
@@ -46,6 +47,8 @@ def search_results(query):
 							(Books.title==search_query) |
 							(Books.author==search_query) |
 							(Books.isbn==search_query)).all()
+
+
 			return search_result
 	return redirect('/index/')
 
@@ -100,8 +103,24 @@ def signup():
 	if request.method == 'GET':
 		return render_template('register.html', form=form)
 
+
 @app.route('/logout')
 def logout():
 	session.pop('logged_in', None)
 	flash('Goodbye!')
 	return redirect(url_for('login'))
+
+
+@app.route('/book-detail/<isbn>', methods=['GET', 'POST'])
+def book_detail(isbn=None, error=None):
+	book_query = Books.query.filter_by(isbn=isbn).first()
+	response = requests.get(
+						"https://www.goodreads.com/book/review_counts.json",
+						params={"key":API_KEY, "isbns": isbn})
+	if response.status_code == 200:
+		response = response.json()
+	else:
+		error = 'No books match those ISBNs.'
+	return render_template('book_detail.html',
+							isbn=isbn, response=response['books'],
+							book=book_query ,error=error)
