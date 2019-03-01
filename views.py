@@ -8,6 +8,7 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -26,22 +27,26 @@ def connect_db():
 	return sqlite3.connect(app.config['DATABASE_PATH'])
 
 @app.route('/index/', methods=['GET', 'POST'])
-def index():
+def index(results=None):
 	query = SearchForm(request.form)
 	if request.method == 'POST':
-		return search_results(query)
+		results = search_results(query)
 	res = requests.get("https://www.goodreads.com/book/review_counts.json",
 			params={"key":API_KEY, "isbns": "9781632168146"})
-	return render_template('index.html', form=query)
+	return render_template('index.html', form=query, results=results)
 
 @app.route('/results')
 def search_results(query):
 	results = []
-	search_query = query.data['query']
-	if search_query:
-		print(search_query)
-		search_result = Books.query.filter(year=search_query)
-		print(search_result) 
+	if query:
+		search_query = query.data['query']
+		if search_query:
+			search_result = Books.query.filter(
+							(Books.year==search_query) |
+							(Books.title==search_query) |
+							(Books.author==search_query) |
+							(Books.isbn==search_query)).all()
+			return search_result
 	return redirect('/index/')
 
 
@@ -68,8 +73,7 @@ def login():
 				error = 'Invalid username or password.'
 		else:
 			return render_template('login.html',form=form, error=error)
-	if request.method == 'GET':
-		return render_template('login.html',form=form, error=error)
+	return render_template('login.html',form=form, error=error)
 
 
 @app.route("/signup", methods=['GET', 'POST'])

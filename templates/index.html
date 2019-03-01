@@ -20,7 +20,7 @@
 		<br>
 		<form class = "search_form" role="form" method="POST" action="">
 			{{form.csrf_token}}
-			{{form.query(placeholder="Enter your Query")}}
+			{{form.query(placeholder="Enter title/isbn/author/year")}}
 			{% if form.query.errors %}
 		        <span class="error">
 		          {% for error in form.query.errors %}
@@ -30,5 +30,24 @@
 		      {% endif %}
         <button class="btn btn-sm btn-success" type="submit">Search</button>
 		</form>
+		<br>
+		{% if results %}
+			<table class="table">
+				<tr>
+					<th>ISBN</th>
+					<th>Title</th>
+					<th>Author</th>
+					<th>Year</th>
+				</tr>
+				{% for result in results %}
+					<tr>
+						<td>{{result.isbn}}</td>
+						<td>{{result.title}}</td>
+						<td>{{result.author}}</td>
+						<td>{{result.year}}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% endif %}
 	</div>
 {% endblock %}
