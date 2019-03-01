@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block nav %}
+{% endblock %}
+{% block content %}
+	<div class = "container">
+		{% if error %}
+			{{error}}
+		{% endif %}
+		<h1>{{book.title}}</h1>
+		<br>
+			{% for key, value in response.0.items() %}
+				<span><strong>{{key}}:</strong></span>
+				<span>{{value}}</span>
+				<br>
+			{% endfor %}
+	</div>
+{% endblock %}
