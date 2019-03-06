@@ -22,8 +22,15 @@
 		          {% endfor %}
 		        </span>
 		      {% endif %}
-        <button class="btn btn-sm btn-success" type="submit">Comment</button>
+        <button class="btn btn-sm btn-success" type="submit">Submit your review</button>
 		</form>
+		</div>
+		<div>
+			{% for comments in book_comments %}
+				{{comments.body}} <br>
+				by
+				{{comments.author.username}}
+			{% endfor %}
 		</div>
 	</div>
 {% endblock %}
