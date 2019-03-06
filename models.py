@@ -79,11 +79,12 @@ class Rating(db.Model):
 
 class Comment(db.Model):
 	__tablename__ = 'comments'
+
 	id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-	disabled = db.Column(db.Boolean)
-	comment_author = db.Column(db.Integer, db.ForeignKey('users.id'))
+	disabled = db.Column(db.Boolean, default=False)
+	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
 
 	def __init__(
@@ -99,4 +100,4 @@ class Comment(db.Model):
 
 	def __repr__(self):
 		return '<Comment: {0} \n by User:{1}>'.format(
-			self.body, self.author_id.username)
+			self.body, self.author.username)

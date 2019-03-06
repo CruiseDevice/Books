@@ -7,7 +7,8 @@ from flask import (
 		  Flask, session, flash, request, redirect, render_template,
 		  url_for
 )
-from flask_login import login_user, logout_user, login_required, current_user, LoginManager
+from flask_login import login_user, logout_user, login_required, current_user,\
+					LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy import and_
@@ -18,7 +19,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from credentials import API_KEY, API_SECRET
 
 from forms import LoginForm, SignUpForm, SearchForm, CommentForm
-from models import User, db, Books
+from models import User, db, Books, Comment
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -116,7 +117,11 @@ def logout():
 @app.route('/book-detail/<isbn>', methods=['GET', 'POST'])
 @login_required
 def book_detail(isbn=None, error=None):
+
+	all_comments = Comment.query.filter_by()
 	book_query = Books.query.filter_by(isbn=isbn).first()
+	book_comments = book_query.comments.order_by(Comment.timestamp.asc())
+	book_comments = book_comments.all()
 	response = requests.get(
 						"https://www.goodreads.com/book/review_counts.json",
 						params={"key":API_KEY, "isbns": isbn})
@@ -127,9 +132,15 @@ def book_detail(isbn=None, error=None):
 	comment_form = CommentForm(request.form)
 	if request.method == "POST":
 		if comment_form.validate_on_submit():
-			comment_body = comment_form.body.data
+			comment = Comment(body=comment_form.body.data,
+							  book_id=book_query.id,
+							  author_id=user.id)
+			db.session.add(comment)
+			db.session.commit()
+			flash('Your comment has been published.')
 			return redirect(url_for('book_detail', isbn=isbn))
 	return render_template('book_detail.html',
-							isbn=isbn, response=response['books'],
-							book=book_query ,error=error,
-							comment_form=comment_form)
+					isbn=isbn, response=response['books'],
+					book=book_query ,error=error,
+					comment_form=comment_form,
+					book_comments=book_comments)
