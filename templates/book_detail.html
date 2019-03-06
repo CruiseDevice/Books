@@ -8,10 +8,22 @@
 		{% endif %}
 		<h1>{{book.title}}</h1>
 		<br>
-			{% for key, value in response.0.items() %}
-				<span><strong>{{key}}:</strong></span>
-				<span>{{value}}</span>
-				<br>
-			{% endfor %}
+			<strong>Average Rating of the Book on GoodReads: </strong>{{response.0['average_rating']}} <br>
+			<strong>Number of Rating the work received: </strong> {{response.0['work_ratings_count']}}
+		<div class = "">
+			<form class = "comment_form" role="form" method="POST" action="">
+			{{comment_form.csrf_token}}
+			{{comment_form.body(placeholder="")}}
+			{{comment_form.rate}}
+			{% if comment_form.body.errors %}
+		        <span class="error">
+		          {% for error in comment_form.body.errors %}
+		            {{ error }}
+		          {% endfor %}
+		        </span>
+		      {% endif %}
+        <button class="btn btn-sm btn-success" type="submit">Comment</button>
+		</form>
+		</div>
 	</div>
 {% endblock %}
