@@ -29,7 +29,8 @@
 			{% for comments in book_comments %}
 				{{comments.body}} <br>
 				by
-				{{comments.author.username}}
+				<strong>{{comments.author.username}}</strong>
+				<br>
 			{% endfor %}
 		</div>
 	</div>

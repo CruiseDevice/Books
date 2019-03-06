@@ -48,10 +48,10 @@ def search_results(query):
 		search_query = query.data['query']
 		if search_query:
 			search_result = Books.query.filter(
-							(Books.year==search_query) |
-							(Books.title==search_query) |
-							(Books.author==search_query) |
-							(Books.isbn==search_query)).all()
+				(Books.year==search_query) |
+				(Books.title==search_query) |
+				(Books.author==search_query) |
+				(Books.isbn==search_query)).all()
 			return search_result
 	return redirect('/index/')
 
@@ -117,28 +117,32 @@ def logout():
 @app.route('/book-detail/<isbn>', methods=['GET', 'POST'])
 @login_required
 def book_detail(isbn=None, error=None):
-
+	user = current_user._get_current_object()
 	all_comments = Comment.query.filter_by()
 	book_query = Books.query.filter_by(isbn=isbn).first()
 	book_comments = book_query.comments.order_by(Comment.timestamp.asc())
+	user_comment = book_comments.filter_by(author_id=user.id).all()
 	book_comments = book_comments.all()
 	response = requests.get(
-						"https://www.goodreads.com/book/review_counts.json",
-						params={"key":API_KEY, "isbns": isbn})
+		"https://www.goodreads.com/book/review_counts.json",
+		params={"key":API_KEY, "isbns": isbn})
 	if response.status_code == 200:
 		response = response.json()
 	else:
 		error = 'No books match those ISBNs.'
 	comment_form = CommentForm(request.form)
 	if request.method == "POST":
-		if comment_form.validate_on_submit():
-			comment = Comment(body=comment_form.body.data,
-							  book_id=book_query.id,
-							  author_id=user.id)
-			db.session.add(comment)
-			db.session.commit()
-			flash('Your comment has been published.')
-			return redirect(url_for('book_detail', isbn=isbn))
+		if user_comment is not None:
+			flash('You can only review the book once.')
+		else:
+			if comment_form.validate_on_submit():
+				comment = Comment(body=comment_form.body.data,
+								  book_id=book_query.id,
+								  author_id=user.id)
+				db.session.add(comment)
+				db.session.commit()
+				flash('Your comment has been published.')
+				return redirect(url_for('book_detail', isbn=isbn))
 	return render_template('book_detail.html',
 					isbn=isbn, response=response['books'],
 					book=book_query ,error=error,
