@@ -23,4 +23,5 @@ class SearchForm(Form):
 
 class CommentForm(Form):
 	body = StringField(
-		'Body', widget=TextArea(), render_kw={"rows":7, "cols":50}, validators=[DataRequired()])
+		'Body', widget=TextArea(),
+		render_kw={"rows":7, "cols":50}, validators=[DataRequired()])
