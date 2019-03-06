@@ -1,5 +1,5 @@
 from views import app, login_manager
-from models import AnonymousUser
+from models import AnonymousUser, User
 from _config import SECRET_KEY
 
 login_manager.init_app(app)
@@ -9,6 +9,6 @@ login_manager.anonymous_user = AnonymousUser
 
 @login_manager.user_loader
 def load_user(user_id):
-	return None
+	return User.query.get(int(user_id))
 
 app.run(debug=True)
