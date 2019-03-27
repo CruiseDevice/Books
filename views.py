@@ -5,7 +5,7 @@ import requests
 
 from flask import (
 		  Flask, session, flash, request, redirect, render_template,
-		  url_for
+		  url_for, jsonify
 )
 from flask_login import login_user, logout_user, login_required, current_user,\
 					LoginManager
@@ -148,3 +148,23 @@ def book_detail(isbn=None, error=None):
 					book=book_query ,error=error,
 					comment_form=comment_form,
 					book_comments=book_comments)
+
+
+@app.route('/api/<isbn>', methods=['GET'])
+def api_book_detail(isbn=None, error=None):
+	book = Books.query.filter_by(isbn=isbn).first()
+	res = requests.get("https://www.goodreads.com/book/review_counts.json",
+		params={"key":API_KEY, "isbns": isbn})
+	if res.status_code == 200:
+		res = res.json()
+	response = jsonify({
+			'id': book.id,
+			'isbn': book.isbn,
+			'title': book.title,
+			'author': book.author,
+			'year': book.year,
+			'reviews_count':'' ,
+			'average_score':'' ,
+		})
+	response.status_code = 200
+	return response
